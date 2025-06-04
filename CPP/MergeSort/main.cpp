@@ -52,7 +52,5 @@ void merge(int vet[], int inicio, int meio, int fim)
 	direita = meio+1;
 	aux = 0;
 	tam = fim-inicio+1;
-	
-	
 }
 

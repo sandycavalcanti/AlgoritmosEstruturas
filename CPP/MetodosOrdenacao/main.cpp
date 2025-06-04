@@ -9,17 +9,19 @@
 #include <stdlib.h>
 #include <time.h>
 // Sessão de prototipação
-void bubbleSort(int *, int, int *, int *);
-void insetionSort(int , int);
-void selectionSort(int *, int , int *, int *);
-void mergeSort(int , int , int);
-void merge(int , int , int , int);
-void heapfy(int , int ,int);
-void heapSort(int, int);
+void bubbleSort(int *, int);
+void insertionSort(int *, int);
+void selectionSort(int *, int);
+void mergeSort(int *, int, int);
+void merge(int *, int, int, int);
+void heapify(int *, int, int);
+void heapSort(int *, int);
+void quickSort(int *, int, int);
+int partition(int *, int, int);
 // Inicio do programa
 int main()
 {
-    int tam, i, comp, troca, chave, menor, fim, inicio;
+    int tam, i, inicio;
 	int vet[] = { 35, 72, 17, 3, 28, 93, 54, 12, 21, 45};	// Vetor Randomico
 //	int vetor[] = { 93, 72, 54, 45, 35, 28, 21, 17, 12, 3};	//Pior caso
 //	int vetor[] = { 3, 12, 17, 21, 28, 35, 45, 54,72, 93};	//Melhor caso
@@ -29,55 +31,51 @@ int main()
 	{
 		printf("%d | ", vet[i]);
 	};
-    tam = sizeof(vet)/sizeof(int);
     printf("\n\nSelecione o método de ordenação:\n");
-    printf("1 - Bubble Sort\n2 - Insertion Sort\n3 - Selection Sort\n4 - Merge Sort\n5 - Heap Sort\n");
+    printf("1 - Bubble Sort\n2 - Insertion Sort\n3 - Selection Sort\n4 - Merge Sort\n5 - Heap Sort\n6 - Quick Sort\n 7 - Sair\n");
     int choice;
     scanf("%d", &choice);
     switch(choice) {
         case 1:
-            bubbleSort(vet, tam, &comp, &troca);
+            bubbleSort(vet, tam-1);
+			puts("\nvetor ordenado pelo método Bubble Sort:");
             break;
         case 2:
-            insetionSort(vet, tam);
+            insertionSort(vet, tam-1);
             puts("\nvetor ordenado pelo método Insertion Sort:");
-            for(i = 0; i < tam; i++)
-            {
-                printf("%d | ", vet[i]);
-            }
-            break;
+			break;
         case 3:
-            selectionSort(vet, tam, &comp, &troca);
+            selectionSort(vet, tam-1);
             puts("\nvetor ordenado pelo método Selection Sort:");
-            for(i = 0; i < tam; i++)
-            {
-                printf("%d | ", vet[i]);
-            }
-            printf("\nQuantidade de comparações: %d ", comp);
-            printf("\nQuantidade de trocas: %d ", troca);
             break;
         case 4:
-            mergeSort(vet, inicio, tam);
+			inicio = 0;
+            mergeSort(vet, inicio, tam-1);
             puts("\nvetor ordenado pelo método Merge Sort:");
-            for(i = 0; i < tam; i++)
-            {
-                printf("%d | ", vet[i]);
-            }
             break;
         case 5:
-        	heapSort(vet, tam);
+        	heapSort(vet, tam-1);
+			puts("\nvetor ordenado pelo método Heap Sort:");
             break;
+		case 6:
+			quickSort(vet, 0, tam-1);
+			puts("\nvetor ordenado pelo método Quick Sort:");
+			break;
+		case 7:
+			printf("Saindo do programa...\n");
+			exit(0);
+			break;
         default:
             printf("Opção inválida!\n");
     }
-	puts("\nvetor ordenado pelo método Heap Sort:");
+	tam = sizeof(vet)/sizeof(int);
 	for(i = 0; i < tam; i++)
 	{
 		printf("%d | ", vet[i]);
 	};
 } // fim do main
 // Metodo de ordenação Bubble Sort
-void bubbleSort(int vetor[], int tam, int comp, int troca){
+void bubbleSort(int vetor[], int tam){
 	// l�gica do Bubble Sort
     int i, aux;
 	while(tam > 0){
@@ -86,23 +84,14 @@ void bubbleSort(int vetor[], int tam, int comp, int troca){
 				aux = vetor[i+1];	// Variavel auxiliar
 				vetor[i+1] = vetor[i];
 				vetor[i] = aux;
-				troca++;
 			};
-			comp++;
 		};
 		tam--;
 	};// fim do While
-	tam = sizeof(vetor)/ sizeof (int);
-	puts("\n\nvetor ordenado por Bubble:");
-	for(i = 0; i < tam; i++){
-		printf("%d | ", vetor[i]);
-	};
-	printf("\nQuantidade de compara��es: %d ", comp);
-	printf("\nQuantidade de trocas: %d ", troca);
 }	// Fim da função BubbleSort
 // Metodo de ordenação Insertion Sort
-void insetionSort(int vet[], int tam){
-	int i, j, k, chave;
+void insertionSort(int vet[], int tam){
+	int i, j, chave;
 	for(i=1; 1<tam;i++){
 		chave = vet[i];
 		j = i-1;
@@ -114,12 +103,12 @@ void insetionSort(int vet[], int tam){
 	};
 };  // Fim do Insertion Sort
 // Metodo de ordenação Selection Sort
-void selectionSort( int vet[], int tam, int comp, int troca)
+void selectionSort( int vet[], int tam)
 {
-    int i, j, chave, menor, aux;
+    int i, j, menor, aux;
     i = j = 0;
 	while(i < tam){
-		chave = menor = i;
+		menor = i;
 		j = i+1;
 		do{
 			if(vet[j] < vet[menor]){
@@ -131,10 +120,8 @@ void selectionSort( int vet[], int tam, int comp, int troca)
 			aux = vet[i];
 			vet[i] = vet[menor];
 			vet[menor] = aux;
-			troca++;
 		};
 		i++;
-		comp++;
 	};
 }; // Fim do Selection Sort
 // Metodo de ordenação Merge Sort
@@ -188,3 +175,43 @@ void heapSort(int vet[], int tam){
 		heapfy(vet,i,0);
 	}
 }// fim da função heapSort
+
+// Fun��o quick sort para a esquerda e direita das parti��es
+void quickSort(int *vet, int inicio, int fim)
+{
+	int pivot = 0;
+	if(fim > inicio)
+	{
+		pivot = partition(vet, inicio, fim);
+		quickSort(vet, inicio, pivot-1);	//quick sort para o lado esquerdo
+		quickSort(vet, pivot+1, fim);		// quick sort para o lado direito
+	};
+};	// Fim da fun��o quickSort
+// Fun��o partition para particionar o conjunto de dados
+int partition(int *vet, int inicio, int fim)
+{
+	int esq, dir, pivot, aux;
+	pivot = vet[inicio];
+	esq = inicio;
+	dir = fim;
+	while(esq < dir)
+	{
+		while(vet[esq] <= pivot)
+		{
+			esq++;
+		};
+		while(vet[dir] > pivot)
+		{
+			dir--;
+		};
+		if(esq < dir)
+		{
+			aux = vet[esq];
+			vet[esq] = vet[dir];
+			vet[dir] = aux;
+		}
+	};	// Fim do While que caminha nas duas dire��es
+	vet[inicio] = vet[dir];
+	vet[dir] = pivot;
+	return dir;
+};	// Fim da fun��o partition
